@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#146c5b">
+  <title>陪诊客户管理</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">+</span>
+      <div>
+        <strong>陪诊客户管理</strong>
+        <span>客户与回访工作台</span>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="button secondary" id="open-import" type="button">导入客户表</button>
+      <button class="button primary" id="open-create" type="button">新增客户</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="summary" aria-label="客户概览">
+      <div><span>当前结果</span><strong id="customer-count">0</strong></div>
+      <div><span>待回访</span><strong id="followup-count">0</strong></div>
+      <p id="page-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="workspace">
+      <form class="filters" id="filter-form">
+        <label>
+          <span>搜索</span>
+          <input name="q" type="search" placeholder="姓名、手机号或备注">
+        </label>
+        <label>
+          <span>服务城市</span>
+          <input name="city" placeholder="全部城市">
+        </label>
+        <label>
+          <span>患者关系</span>
+          <select name="relationship">
+            <option value="">全部关系</option>
+            <option>本人</option>
+            <option>家属</option>
+            <option>朋友</option>
+            <option>其他</option>
+          </select>
+        </label>
+        <button class="button filter-button" type="submit">筛选</button>
+        <button class="text-button" id="reset-filter" type="button">重置</button>
+      </form>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>客户</th>
+              <th>手机号</th>
+              <th>患者关系</th>
+              <th>服务城市</th>
+              <th>回访时间</th>
+              <th><span class="sr-only">操作</span></th>
+            </tr>
+          </thead>
+          <tbody id="customer-rows"></tbody>
+        </table>
+        <div class="empty" id="empty-state" hidden>暂无符合条件的客户</div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="customer-dialog">
+    <form method="dialog" class="dialog-shell" id="customer-form">
+      <div class="dialog-head">
+        <div>
+          <span class="eyebrow">客户档案</span>
+          <h2 id="customer-dialog-title">新增客户</h2>
+        </div>
+        <button class="close-button" value="cancel" type="submit" aria-label="关闭">关闭</button>
+      </div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label><span>客户姓名</span><input name="name" required></label>
+        <label><span>手机号</span><input name="phone" inputmode="tel" required></label>
+        <label><span>患者关系</span><select name="patientRelationship" required><option value="">请选择</option><option>本人</option><option>家属</option><option>朋友</option><option>其他</option></select></label>
+        <label><span>服务城市</span><input name="serviceCity" required></label>
+        <label class="wide"><span>回访时间</span><input name="followUpAt" type="datetime-local"></label>
+        <label class="wide"><span>备注</span><textarea name="notes" rows="4"></textarea></label>
+      </div>
+      <p class="form-error" id="customer-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" value="cancel" type="submit">取消</button>
+        <button class="button primary" id="save-customer" type="button">保存客户</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="detail-dialog">
+    <div class="dialog-shell detail-shell">
+      <div class="dialog-head">
+        <div><span class="eyebrow">客户详情</span><h2 id="detail-name"></h2></div>
+        <button class="close-button" id="close-detail" type="button">关闭</button>
+      </div>
+      <dl class="detail-grid" id="detail-grid"></dl>
+      <div class="notes-block"><span>备注</span><p id="detail-notes"></p></div>
+      <div class="dialog-actions"><button class="button primary" id="edit-customer" type="button">编辑客户</button></div>
+    </div>
+  </dialog>
+
+  <dialog id="import-dialog">
+    <div class="dialog-shell import-shell">
+      <div class="dialog-head">
+        <div><span class="eyebrow">批量录入</span><h2>导入客户表</h2></div>
+        <button class="close-button" id="close-import" type="button">关闭</button>
+      </div>
+      <div class="import-fields">
+        <label><span>导入编号</span><input id="import-number" required></label>
+        <label><span>CSV 客户表</span><input id="import-file" type="file" accept=".csv,text/csv" required></label>
+      </div>
+      <div class="import-summary" id="import-summary">尚未选择客户表</div>
+      <section class="duplicate-panel" aria-labelledby="duplicate-title">
+        <div class="panel-head"><h3 id="duplicate-title">重复手机号预览</h3><button class="button secondary compact" id="preview-duplicates" type="button" disabled>刷新预览</button></div>
+        <div id="duplicate-results" class="duplicate-results">暂无预览结果</div>
+      </section>
+      <p class="form-error" id="import-error" role="alert"></p>
+      <div class="dialog-actions">
+        <button class="button secondary" id="cancel-import" type="button">取消</button>
+        <button class="button primary" id="submit-import" type="button" disabled>确认导入</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
