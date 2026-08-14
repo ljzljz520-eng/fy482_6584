@@ -86,6 +86,13 @@ func (s *Service) ImportCustomers(request model.ImportRequest) (model.ImportResu
 	if request.ImportNumber == "" || len(request.Rows) == 0 {
 		return model.ImportResult{}, fmt.Errorf("%w: import number and rows are required", ErrInvalid)
 	}
+	completed, found, err := s.store.CompletedImport(request.ImportNumber)
+	if err != nil {
+		return model.ImportResult{}, err
+	}
+	if found {
+		return completed, nil
+	}
 	now := s.clock.Now().UTC().Format(time.RFC3339)
 	customers := make([]model.Customer, 0, len(request.Rows))
 	operations := make([]model.Operation, 0, len(request.Rows))
